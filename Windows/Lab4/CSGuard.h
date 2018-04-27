@@ -4,8 +4,8 @@
 class CSGuard
 {
 public:
-	void leaveSection();
-	void enterSection();
+	void LeaveSection();
+	void EnterSection();
 
 	CSGuard(LPCRITICAL_SECTION criticalSectionPointer);
 	~CSGuard();
