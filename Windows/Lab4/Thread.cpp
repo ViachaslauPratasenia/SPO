@@ -70,7 +70,7 @@ void Thread::Terminate()
 {
 	if (this->data_ != nullptr)
 	{
-		if (this->invoked_)
+		if (*(this->data_->run_flag) != 0)
 		{
 			*(this->data_->run_flag) = 0;
 			WaitForSingleObject(this->thread_handle_, INFINITE);
