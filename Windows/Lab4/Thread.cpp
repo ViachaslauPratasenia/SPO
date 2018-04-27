@@ -42,6 +42,9 @@ void Thread::SetStackSize(size_t stack_size)
 
 void Thread::Invoke()
 {
+	if (this->invoked_)
+		this->Terminate();
+	
 	if (stack_size_ == 0)
 		throw InvalidStackSizeException("The value of param stackSize is invalid!");
 	if (start_routine_ == nullptr)
@@ -72,6 +75,7 @@ void Thread::Terminate()
 
 		CloseHandle(this->thread_handle_);
 		this->DeleteData();
+		this->invoked_ = false;
 	}
 }
 
