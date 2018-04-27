@@ -48,13 +48,13 @@ void Thread::Invoke()
 		throw InvalidStartRoutineException("The value of param startRoutine is invalid!");
 	if (critical_section_ == nullptr)
 		throw InvalidSectionException("The value of param stackSize is invalid!");
-	
-	if (this->data_ != nullptr)
-		this->Terminate();
+
+	if (*this->data_->run_flag != 0)
+		return;
+	else
+		*this->data_->run_flag = 1;
 
 	HANDLE synchronizeEvent = CreateEvent(NULL, FALSE, false, kSynchronizeEveventName.c_str());
-
-	this->InitializeData();
 
 	this->thread_handle_ = CreateThread(NULL, this->stack_size_, start_routine_, data_, NULL, &(this->data_->thread_id));
 	if (this->thread_handle_ != NULL)
@@ -68,13 +68,12 @@ void Thread::Invoke()
 
 void Thread::Terminate()
 {
-	if (this->data_ != nullptr)
+	if (*(this->data_->run_flag) != 0)
 	{
-		*(this->data_->run_flag) = 0;
+		*this->data_->run_flag = 0;
 		WaitForSingleObject(this->thread_handle_, INFINITE);
-
 		CloseHandle(this->thread_handle_);
-		this->DeleteData();
+		this->data_->thread_id = 0;
 	}
 }
 
@@ -99,19 +98,21 @@ void Thread::InitializeData()
 	this->data_ = new ThreadData;
 	this->data_->critical_section = critical_section_;
 	this->data_->event_name = kSynchronizeEveventName.c_str();
-	this->data_->run_flag = new int(1);
+	this->data_->run_flag = new int;
+	*this->data_->run_flag = 0;
 	this->data_->last_thread = &last_thread_;
 	this->data_->thread_id = 0;
 }
 
 Thread::Thread()
 {
-	this->data_ = nullptr;
+	this->InitializeData();
 }
 
 Thread::~Thread()
 {
 	this->Terminate();
+	this->DeleteData();
 }
 
 DWORD WINAPI CustomThread::ThreadRoutine(PVOID pvParam)
