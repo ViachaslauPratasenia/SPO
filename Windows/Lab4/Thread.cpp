@@ -42,15 +42,15 @@ void Thread::SetStackSize(size_t stack_size)
 
 void Thread::Invoke()
 {
-	if (this->invoked_)
-		this->Terminate();
-	
 	if (stack_size_ == 0)
 		throw InvalidStackSizeException("The value of param stackSize is invalid!");
 	if (start_routine_ == nullptr)
 		throw InvalidStartRoutineException("The value of param startRoutine is invalid!");
 	if (critical_section_ == nullptr)
 		throw InvalidSectionException("The value of param stackSize is invalid!");
+	
+	if (this->invoked_)
+		this->Terminate();
 
 	HANDLE synchronizeEvent = CreateEvent(NULL, FALSE, false, kSynchronizeEveventName.c_str());
 
