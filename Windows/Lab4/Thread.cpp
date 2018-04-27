@@ -61,6 +61,7 @@ void Thread::Invoke()
 	{
 		WaitForSingleObject(synchronizeEvent, INFINITE);
 		CloseHandle(synchronizeEvent);
+		this->invoked_ = true;
 	}
 	else
 		throw ThreadCreationException("CreateEvent returned NULL");
@@ -108,6 +109,7 @@ void Thread::InitializeData()
 Thread::Thread()
 {
 	this->data_ = nullptr;
+	this->invoked_ = false;
 }
 
 Thread::~Thread()
