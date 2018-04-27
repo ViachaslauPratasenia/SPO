@@ -1,6 +1,6 @@
 #include "CSGuard.h"
 
-void CSGuard::enterSection()
+void CSGuard::EnterSection()
 {
 	if (!this->in_)
 	{
@@ -9,7 +9,7 @@ void CSGuard::enterSection()
 	}
 }
 
-void CSGuard::leaveSection()
+void CSGuard::LeaveSection()
 {
 	if (this->in_)
 	{
