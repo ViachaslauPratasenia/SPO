@@ -98,8 +98,7 @@ void Thread::InitializeData()
 	this->data_ = new ThreadData;
 	this->data_->critical_section = critical_section_;
 	this->data_->event_name = kSynchronizeEveventName.c_str();
-	this->data_->run_flag = new int;
-	*this->data_->run_flag = 0;
+	this->data_->run_flag = new int(0);
 	this->data_->last_thread = &last_thread_;
 	this->data_->thread_id = 0;
 }
