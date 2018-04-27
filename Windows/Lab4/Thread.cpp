@@ -49,7 +49,7 @@ void Thread::Invoke()
 	if (critical_section_ == nullptr)
 		throw InvalidSectionException("The value of param stackSize is invalid!");
 	
-	if (this->invoked_)
+	if (this->data_ != nullptr)
 		this->Terminate();
 
 	HANDLE synchronizeEvent = CreateEvent(NULL, FALSE, false, kSynchronizeEveventName.c_str());
@@ -61,7 +61,6 @@ void Thread::Invoke()
 	{
 		WaitForSingleObject(synchronizeEvent, INFINITE);
 		CloseHandle(synchronizeEvent);
-		this->invoked_ = true;
 	}
 	else
 		throw ThreadCreationException("CreateEvent returned NULL");
@@ -69,14 +68,16 @@ void Thread::Invoke()
 
 void Thread::Terminate()
 {
-	if (this->invoked_)
+	if (this->data_ != nullptr)
 	{
-		*(this->data_->run_flag) = 0;
-		WaitForSingleObject(this->thread_handle_, INFINITE);
+		if (this->invoked_)
+		{
+			*(this->data_->run_flag) = 0;
+			WaitForSingleObject(this->thread_handle_, INFINITE);
 
-		CloseHandle(this->thread_handle_);
-		this->DeleteData();
-		this->invoked_ = false;
+			CloseHandle(this->thread_handle_);
+			this->DeleteData();
+		}
 	}
 }
 
@@ -109,7 +110,6 @@ void Thread::InitializeData()
 Thread::Thread()
 {
 	this->data_ = nullptr;
-	this->invoked_ = false;
 }
 
 Thread::~Thread()
