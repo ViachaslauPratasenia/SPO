@@ -47,6 +47,7 @@ namespace CustomThread
 	protected:
 		HANDLE thread_handle_;
 		ThreadData* data_;
+		bool invoked_;
 
 	protected:
 		static int last_thread_;
