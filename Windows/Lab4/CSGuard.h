@@ -12,6 +12,6 @@ public:
 	CSGuard(const CSGuard&) = delete;
 	CSGuard& operator=(const CSGuard&) = delete;
 private:
-	LPCRITICAL_SECTION _criticalSectionPointer;
-	bool _in;
+	LPCRITICAL_SECTION criticalSectionPointer_;
+	bool in_;
 };
