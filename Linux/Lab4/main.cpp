@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     int mutexError = pthread_mutex_init(&mutex, NULL);
     if(mutexError != 0)
     {
-        cout << "Error while creating new thread (code): " << mutexError << endl;
+        cout << "Error while creating mutex (code): " << mutexError << endl;
         system("pause");
         exit(EXIT_FAILURE);
     }
