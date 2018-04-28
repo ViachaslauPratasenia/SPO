@@ -55,6 +55,7 @@ int main(int argc, char** argv)
 				else
 				{
 					threadlist.back()->Terminate();
+					delete threadlist.back();
 					threadlist.pop_back();
 				}
 				break;
@@ -66,6 +67,7 @@ int main(int argc, char** argv)
 					for (auto &thread : threadlist)
 					{
 						thread->Terminate();
+						delete thread;
 					}
 					threadlist.clear();
 
@@ -86,6 +88,7 @@ int main(int argc, char** argv)
 			for (auto &thread : threadlist)
 			{
 				thread->Terminate();
+				delete thread;
 			}
 			threadlist.clear();
 		}
