@@ -54,9 +54,9 @@ int main(int argc, char** argv)
     }
 
     cout << "Hello! This is the parent process." << endl;
-    cout << "If you want to create new process, please press '+'" << endl;
-    cout << "If you want to delete last process, please press '-'" << endl;
-    cout << "If you want to quit, please press 'q'" << endl;
+    cout << "If you want to create new process, press '+'" << endl;
+    cout << "If you want to delete last process, press '-'" << endl;
+    cout << "If you want to quit, press 'q'" << endl;
     cout << "Press any key to begin..." << endl;
 
     cin.ignore();
