@@ -9,20 +9,25 @@
 
 using namespace std;
 
+unsigned int last_thread = 0;
+
 void * threadStartRoutine(void* arg)
 {
     pthread_mutex_t mutex = *((pthread_mutex_t*)(arg));
 
     //saying to a main thread, that this subthread has started working
-    kill(getpid(), SIGCONT);
+    kill(getpid(), SIGUSR1);
 
     while(true)
     {
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+        if(last_thread == (unsigned int)pthread_self())
+            sleep(1);
         pthread_mutex_lock(&mutex);
 
         cout << "Hello! I'm subthread " << (unsigned int)pthread_self() << endl;
-        sleep(1);
+
+        last_thread = (unsigned int)pthread_self();
 
         pthread_mutex_unlock(&mutex);
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
