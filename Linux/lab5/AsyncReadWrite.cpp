@@ -95,131 +95,67 @@ void AsyncReadWrite::ReleaseData()
 
 
 int AsyncReadWrite::ConcatFiles(std::vector<std::string> source_files, std::string output_file_path)
-
 {
-
     this->files_to_write_ = 0;
-
     this->output_file_ = output_file_path;
-
     this->source_file_names_ = source_files;
 
-
-
     int offset = 0;
-
     for (auto &file_name : this->source_file_names_)
-
     {
-
-
-
         this->thread_data_vector_.push_back(new aiocb);
-
         aiocb empty = { 0 };
-
         *this->thread_data_vector_.back() = empty;
-
         FILE* file = fopen(file_name.c_str(), "r");
-
         if(file == NULL)
-
         {
-
             cout << "Error while loading file..." << endl;
-
             continue;
-
         }
-
         this->thread_data_vector_.back()->aio_fildes = fileno(file);
-
-
-
         struct stat file_info = { 0 };
-
         fstat(thread_data_vector_.back()->aio_fildes, &file_info);
-
-
-
+	    
 	if(file_info.st_size == 0)
-
 	{
-
 		delete this->thread_data_vector_.back();
-
 		this->thread_data_vector_.pop_back();
-
 		fclose(file);
-
 		continue;
-
 	}
 
-
-
         this->read_files_data_.push_back(new ReadFileData);;
-
         this->read_files_data_.back()->offset = offset;
-
         this->read_files_data_.back()->size = file_info.st_size;
-
         this->read_files_data_.back()->data = new char[file_info.st_size];
-
         memset( this->read_files_data_.back()->data, 0, sizeof(char));
-
         this->read_files_data_.back()->data[0] = '\0';
 
-
-
         this->thread_data_vector_.back()->aio_buf = this->read_files_data_.back()->data;
-
         this->thread_data_vector_.back()->aio_nbytes = file_info.st_size;
-
         this->thread_data_vector_.back()->aio_reqprio = 0;
-
         this->thread_data_vector_.back()->aio_offset = 0;
-
         this->thread_data_vector_.back()->aio_sigevent.sigev_notify = SIGEV_THREAD;
-
         this->thread_data_vector_.back()->aio_sigevent.sigev_notify_function = AsyncReadWrite::ReadEndRoutine;
-
         this->thread_data_vector_.back()->aio_sigevent.sigev_notify_attributes = NULL;
-
         this->thread_data_vector_.back()->aio_sigevent.sigev_value.sival_int = this->semaphoreId;
 
-
-
         pthread_t id;
-
         pthread_create(&id, NULL, AsyncReadWrite::Read, reinterpret_cast<void*>(this->thread_data_vector_.back()));
-
         this->reading_threads_.push_back(id);
 
-
-
         offset += file_info.st_size;
-
         files_to_write_++;
-
     }
-
     pthread_create(&this->writing_thread_, NULL, AsyncReadWrite::Write, reinterpret_cast<void*>(this));
-
-
-
+	
     void** threadReciever = new void*;
-
+	
     pthread_join(this->writing_thread_, threadReciever);
-
-
 
     this->ReleaseData();
 
-
-
     return this->thread_data_vector_.size();
-
 }
 
 
