@@ -158,8 +158,6 @@ int AsyncReadWrite::ConcatFiles(std::vector<std::string> source_files, std::stri
     return this->thread_data_vector_.size();
 }
 
-
-
 void* AsyncReadWrite::Write(void* arg)
 {
     AsyncReadWrite* caller_instance = reinterpret_cast<AsyncReadWrite*>(arg);
