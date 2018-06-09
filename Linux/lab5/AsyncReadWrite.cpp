@@ -161,197 +161,100 @@ int AsyncReadWrite::ConcatFiles(std::vector<std::string> source_files, std::stri
 
 
 void* AsyncReadWrite::Write(void* arg)
-
 {
-
     AsyncReadWrite* caller_instance = reinterpret_cast<AsyncReadWrite*>(arg);
-
-
-
+	
     vector<aiocb*> aio_data;
-
-
 
     FILE* output_file = fopen(caller_instance->output_file_.c_str(), "w");
 
-
-
     while (caller_instance->files_to_write_)
-
     {
-
         sembuf semaphoreSetr = { 0 };
-
         semaphoreSetr.sem_num = caller_instance->kReadSemaphoreIndex;
-
         semaphoreSetr.sem_op = -1;
-
         semaphoreSetr.sem_flg = 0;
-
         semop(caller_instance->semaphoreId, &semaphoreSetr, 1);
-
-
 
         semaphoreSetr.sem_num = caller_instance->kReadSemaphoreIndex;
-
         semaphoreSetr.sem_op = 1;
-
         semaphoreSetr.sem_flg = 0;
-
         semop(caller_instance->semaphoreId, &semaphoreSetr, 1);
-
-
 
         for (auto &element : caller_instance->read_files_data_)
-
         {
-
             if(element->data[0] != '\0')
-
             {
-
                 aiocb empty = { 0 };
 
                 aio_data.push_back(new aiocb);
 
                 *aio_data.back() = empty;
-
                 aio_data.back()->aio_buf = element->data;
-
                 aio_data.back()->aio_fildes = fileno(output_file);
-
                 aio_data.back()->aio_nbytes = element->size;
-
                 aio_data.back()->aio_reqprio = 0;
-
                 aio_data.back()->aio_offset = element->offset;
-
                 aio_data.back()->aio_sigevent.sigev_notify = SIGEV_THREAD;
-
                 aio_data.back()->aio_sigevent.sigev_notify_function = AsyncReadWrite::WriteEndRoutine;
-
                 aio_data.back()->aio_sigevent.sigev_notify_attributes = NULL;
-
                 aio_data.back()->aio_sigevent.sigev_value.sival_int = caller_instance->semaphoreId;
-
-
 
                 aio_write(aio_data.back());
 
-
-
                 semaphoreSetr.sem_num = caller_instance->kReadSemaphoreIndex;
-
                 semaphoreSetr.sem_op = -1;
-
                 semaphoreSetr.sem_flg = 0;
-
                 semop(caller_instance->semaphoreId, &semaphoreSetr, 1);
-
                 caller_instance->files_to_write_--;
-
             }
-
         }
-
     }
-
-
 
     sembuf semaphoreSetw = { 0 };
-
     semaphoreSetw.sem_num = caller_instance->kWriteSemaphoreIndex;
-
     semaphoreSetw.sem_op = (int)((-1) * caller_instance->thread_data_vector_.size());
-
     semaphoreSetw.sem_flg = 0;
-
     semop(caller_instance->semaphoreId, &semaphoreSetw, 1);
 
-
-
     for (auto &data : aio_data)
-
     {
-
         delete data;
-
     }
-
-
 
     fclose(output_file);
 
-
-
     return 0;
-
 }
-
-
 
 void AsyncReadWrite::WriteEndRoutine(sigval_t arg)
-
 {
-
     sembuf semaphoreSet = { 0 };
-
     semaphoreSet.sem_num = AsyncReadWrite::kWriteSemaphoreIndex;
-
     semaphoreSet.sem_op = 1;
-
     semaphoreSet.sem_flg = 0;
-
     semop(arg.sival_int, &semaphoreSet, 1);
-
 }
-
-
 
 void AsyncReadWrite::ReadEndRoutine(sigval_t arg)
-
 {
-
     sembuf semaphoreSet = { 0 };
-
     semaphoreSet.sem_num = AsyncReadWrite::kReadSemaphoreIndex;
-
     semaphoreSet.sem_op = 1;
-
     semaphoreSet.sem_flg = 0;
-
     semop(arg.sival_int, &semaphoreSet, 1);
-
 }
-
-
 
 void* AsyncReadWrite::Read(void* arg)
-
 {
-
     aiocb* thisAiocb = reinterpret_cast<aiocb*>(arg);
-
-
-
     aio_read(thisAiocb);
-
-
-
     return 0;
-
 }
 
-
-
 extern "C" void PerformConcat(std::vector<std::string> source_files, std::string output_file_path)
-
 {
-
 	AsyncReadWrite* object = new AsyncReadWrite;
-
 	object->ConcatFiles(source_files, output_file_path);
-
 	delete object;	
-
 }
