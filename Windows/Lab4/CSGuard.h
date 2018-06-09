@@ -4,14 +4,14 @@
 class CSGuard
 {
 public:
-	void leaveSection();
-	void enterSection();
+	void LeaveSection();
+	void EnterSection();
 
 	CSGuard(LPCRITICAL_SECTION criticalSectionPointer);
 	~CSGuard();
 	CSGuard(const CSGuard&) = delete;
 	CSGuard& operator=(const CSGuard&) = delete;
 private:
-	LPCRITICAL_SECTION _criticalSectionPointer;
-	bool _in;
+	LPCRITICAL_SECTION criticalSectionPointer_;
+	bool in_;
 };

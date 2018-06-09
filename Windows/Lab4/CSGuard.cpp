@@ -1,31 +1,31 @@
 #include "CSGuard.h"
 
-void CSGuard::enterSection()
+void CSGuard::EnterSection()
 {
-	if (!this->_in)
+	if (!this->in_)
 	{
-		EnterCriticalSection(_criticalSectionPointer);
-		this->_in = true;
+		EnterCriticalSection(criticalSectionPointer_);
+		this->in_ = true;
 	}
 }
 
-void CSGuard::leaveSection()
+void CSGuard::LeaveSection()
 {
-	if (this->_in)
+	if (this->in_)
 	{
-		LeaveCriticalSection(_criticalSectionPointer);
-		this->_in = false;
+		LeaveCriticalSection(criticalSectionPointer_);
+		this->in_ = false;
 	}
 }
 
 CSGuard::CSGuard(LPCRITICAL_SECTION criticalSectionPointer) :
-	_criticalSectionPointer(criticalSectionPointer), _in(false)
+	criticalSectionPointer_(criticalSectionPointer), in_(false)
 {
 }
 
 CSGuard::~CSGuard()
 {
-	if(this->_in)
-		LeaveCriticalSection(_criticalSectionPointer);
+	if(this->in_)
+		LeaveCriticalSection(criticalSectionPointer_);
 }
 

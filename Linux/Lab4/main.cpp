@@ -9,20 +9,25 @@
 
 using namespace std;
 
+unsigned int last_thread = 0;
+
 void * threadStartRoutine(void* arg)
 {
     pthread_mutex_t mutex = *((pthread_mutex_t*)(arg));
 
     //saying to a main thread, that this subthread has started working
-    kill(getpid(), SIGCONT);
+    kill(getpid(), SIGUSR1);
 
     while(true)
     {
         pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+        if(last_thread == (unsigned int)pthread_self())
+            sleep(1);
         pthread_mutex_lock(&mutex);
 
         cout << "Hello! I'm subthread " << (unsigned int)pthread_self() << endl;
-        sleep(1);
+
+        last_thread = (unsigned int)pthread_self();
 
         pthread_mutex_unlock(&mutex);
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -48,15 +53,15 @@ int main(int argc, char** argv)
     int mutexError = pthread_mutex_init(&mutex, NULL);
     if(mutexError != 0)
     {
-        cout << "Error while creating new thread (code): " << mutexError << endl;
+        cout << "Error while creating mutex (code): " << mutexError << endl;
         system("pause");
         exit(EXIT_FAILURE);
     }
 
     cout << "Hello! This is the parent process." << endl;
-    cout << "If you want to create new process, please press '+'" << endl;
-    cout << "If you want to delete last process, please press '-'" << endl;
-    cout << "If you want to quit, please press 'q'" << endl;
+    cout << "If you want to create new process, press '+'" << endl;
+    cout << "If you want to delete last process, press '-'" << endl;
+    cout << "If you want to quit, press 'q'" << endl;
     cout << "Press any key to begin..." << endl;
 
     cin.ignore();

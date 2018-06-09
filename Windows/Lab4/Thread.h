@@ -40,15 +40,15 @@ namespace CustomThread
 		Thread& operator=(const Thread&) = delete;
 		~Thread();
 
-	protected:
+	private:
 		void InitializeData();
 		void DeleteData();
 
-	protected:
+	private:
 		HANDLE thread_handle_;
 		ThreadData* data_;
 
-	protected:
+	private:
 		static int last_thread_;
 		static int stack_size_;
 		static LPCRITICAL_SECTION critical_section_;
